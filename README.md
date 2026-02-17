@@ -31,6 +31,13 @@ This Extension enforces strict approval rules on GitLab Merge Requests and provi
 
 ### Mozilla Firefox
 
+#### Installation (Permanent)
+
+1. Visit the [Firefox Add-ons page](https://addons.mozilla.org/en-US/firefox/addon/gitlab-mr-approval-guard/).
+2. Click **Add to Firefox**.
+
+#### Debugging (Temporary)
+
 1. Open Firefox and navigate to `about:debugging`.
 2. Click on **This Firefox** in the sidebar.
 3. Click **Load Temporary Add-on...**.
