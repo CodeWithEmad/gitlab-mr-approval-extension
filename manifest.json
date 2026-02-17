@@ -24,7 +24,10 @@
   ],
    "browser_specific_settings": {
     "gecko": {
-      "id": "gitlab-mr-approval-guard@abstract-technology.de"
+      "id": "gitlab-mr-approval-guard@abstract-technology.de",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
     }
   }
 }
