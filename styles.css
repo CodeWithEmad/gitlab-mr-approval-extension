@@ -1,0 +1,219 @@
+/* New Banner Styles */
+.mr-guard-banner {
+  background-color: #fee2e2;
+  border-bottom: 5px solid #ef4444;
+  padding: 0;
+  z-index: 99999;
+  position: sticky; /* Sticky might not work if parent has overflow, but usually body is fine */
+  top: 0;
+  width: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  display: block;
+}
+
+.mr-guard-content-container {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: flex-start;
+  align-items: center;
+  min-height: 48px;
+  background-color: #7f1d1d; /* Unified background color */
+}
+
+.mr-guard-left-col {
+  background-color: transparent; 
+  color: white;
+  flex: 0 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0 20px;
+  clip-path: none; /* Remove diagonal cut */
+}
+
+.mr-guard-icon {
+  font-size: 1.5rem;
+  margin-right: 12px;
+}
+
+.mr-guard-text-main {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.mr-guard-text-main h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  color: #fff;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.mr-guard-text-main p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #fca5a5;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.highlight-branch {
+  color: #fff;
+  text-decoration: underline;
+  font-weight: 800;
+}
+
+.mr-guard-right-col {
+  flex: 1;
+  background-color: transparent;
+  color: white;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.mr-guard-checklist-title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  font-weight: bold;
+  opacity: 0.9;
+  margin-bottom: 0;
+  margin-right: 15px;
+  letter-spacing: 0.5px;
+  color: #fecaca;
+  white-space: nowrap;
+}
+
+.mr-guard-checklist {
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  gap: 10px;
+}
+
+.mr-guard-checklist li {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-weight: 600;
+  font-size: 0.8rem;
+  border: 1px solid #f87171;
+  padding: 4px 10px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  box-shadow: none;
+}
+
+.mr-guard-checklist li span.check {
+  font-size: 1.2rem;
+  margin-left: 8px;
+}
+
+/* BLOCKED BUTTON REPLACEMENT */
+
+/* Hide the original button effectively */
+.mr-guard-hidden-btn {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  position: absolute !important; 
+}
+
+.mr-guard-blocker {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #fff;
+  border: 1px solid #dbdbdb;
+  border-radius: 4px;
+  padding: 16px;
+  margin: 16px 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans", Ubuntu, Cantarell, "Helvetica Neue", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.mr-guard-blocker-content {
+  display: flex;
+  align-items: center;
+}
+
+.mr-guard-blocker-icon {
+  font-size: 16px;
+  margin-right: 12px;
+  color: #dd2b0e; /* GitLab red-500 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fdd4cd; /* GitLab red-100 */
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.mr-guard-blocker-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.mr-guard-blocker-icon svg {
+  display: block;
+  fill: currentColor;
+}
+
+.mr-guard-blocker-text h3 {
+  margin: 0;
+  color: #333238; /* GitLab gray-900 */
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.mr-guard-blocker-text p {
+  margin: 0;
+  color: #666;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+}
+
+/* Dark Mode Support */
+html.gl-dark .mr-guard-banner {
+  background-color: #380707; /* Darker red background */
+  border-bottom: 5px solid #b91c1c;
+}
+
+html.gl-dark .mr-guard-content-container {
+  background-color: #450a0a; /* Darker red for content */
+}
+
+html.gl-dark .mr-guard-blocker {
+  background-color: #1f1f23; /* GitLab Dark bg */
+  border: 1px solid #484848;
+}
+
+html.gl-dark .mr-guard-blocker-text h3 {
+  color: #ecececec;
+}
+
+html.gl-dark .mr-guard-blocker-text p {
+  color: #bfbfbf;
+}
+
+html.gl-dark .mr-guard-blocker-icon {
+  background-color: #5c1b12; /* Darker background for icon */
+  color: #ec5941; /* Lighter red for icon */
+}

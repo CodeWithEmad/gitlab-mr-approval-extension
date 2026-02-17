@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "GitLab MR Approval Guard",
+  "version": "1.0",
+  "description": "Prevents merging MRs without approvals and shows warnings for critical branches.",
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  },
+  "permissions": [
+    "activeTab",
+    "scripting"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "*://gitlab.com/*",
+        "*://*/*"
+      ],
+      "js": ["content.js"],
+      "css": ["styles.css"]
+    }
+  ],
+   "browser_specific_settings": {
+    "gecko": {
+      "id": "gitlab-mr-approval-guard@abstract-technology.de"
+    }
+  }
+}
