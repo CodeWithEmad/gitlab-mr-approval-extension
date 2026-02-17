@@ -100,6 +100,13 @@ function checkHasApproval() {
   // Strategy: Look for positive indicators of approval
   const bodyText = document.body.innerText;
   
+  // 0. Check if the approval is by the same person (self-approval)
+  // If it says "Approved by you", do not enable merge
+  // Uncomment if you want to block self-approvals.
+  // if (bodyText.includes('Approved by you')) {
+  //     return false;
+  // }
+  
   // 1. Check for "Approved by" text which usually appears when at least one person approved
   // It's often in a widget section stating "Approved by User1, User2"
   if (bodyText.includes('Approved by')) {
@@ -151,26 +158,64 @@ function showCriticalBanner(targetBranch) {
   banner.id = bannerId;
   banner.className = 'mr-guard-banner critical';
   
-  // New layout: Split view
-  banner.innerHTML = `
-    <div class="mr-guard-content-container">
-      <div class="mr-guard-left-col">
-        <div class="mr-guard-icon">⚠️</div>
-        <div class="mr-guard-text-main">
-          <h2>CRITICAL ALERT</h2>
-          <p>Merging into <span class="highlight-branch">${targetBranch}</span></p>
-        </div>
-      </div>
-      <div class="mr-guard-right-col">
-          <div class="mr-guard-checklist-title">REQUIRED ACTIONS:</div>
-          <ul class="mr-guard-checklist">
-            <li><span>Reviewer</span> <span class="check">✅</span></li>
-            <li><span>Channels</span> <span class="check">✅</span></li>
-            <li><span>DevOps</span> <span class="check">✅</span></li>
-          </ul>
-      </div>
-    </div>
-  `;
+  // Create elements safely without innerHTML
+  const container = document.createElement('div');
+  container.className = 'mr-guard-content-container';
+  
+  const leftCol = document.createElement('div');
+  leftCol.className = 'mr-guard-left-col';
+  
+  const icon = document.createElement('div');
+  icon.className = 'mr-guard-icon';
+  icon.textContent = '⚠️';
+  
+  const textMain = document.createElement('div');
+  textMain.className = 'mr-guard-text-main';
+  
+  const h2 = document.createElement('h2');
+  h2.textContent = 'CRITICAL ALERT';
+  
+  const p = document.createElement('p');
+  p.textContent = 'Merging into ';
+  const branchSpan = document.createElement('span');
+  branchSpan.className = 'highlight-branch';
+  branchSpan.textContent = targetBranch;
+  p.appendChild(branchSpan);
+  
+  textMain.appendChild(h2);
+  textMain.appendChild(p);
+  leftCol.appendChild(icon);
+  leftCol.appendChild(textMain);
+  
+  const rightCol = document.createElement('div');
+  rightCol.className = 'mr-guard-right-col';
+  
+  const checklistTitle = document.createElement('div');
+  checklistTitle.className = 'mr-guard-checklist-title';
+  checklistTitle.textContent = 'REQUIRED ACTIONS:';
+  
+  const ul = document.createElement('ul');
+  ul.className = 'mr-guard-checklist';
+  
+  const items = ['Reviewer', 'Channels', 'DevOps'];
+  items.forEach(item => {
+    const li = document.createElement('li');
+    const itemSpan = document.createElement('span');
+    itemSpan.textContent = item;
+    const checkSpan = document.createElement('span');
+    checkSpan.className = 'check';
+    checkSpan.textContent = '✅';
+    li.appendChild(itemSpan);
+    li.appendChild(document.createTextNode(' '));
+    li.appendChild(checkSpan);
+    ul.appendChild(li);
+  });
+  
+  rightCol.appendChild(checklistTitle);
+  rightCol.appendChild(ul);
+  container.appendChild(leftCol);
+  container.appendChild(rightCol);
+  banner.appendChild(container);
   document.body.prepend(banner);
 }
 
@@ -199,19 +244,40 @@ function disableMergeButton(button, reason) {
     blocker.id = blockerId;
     blocker.className = 'mr-guard-blocker';
     
-    blocker.innerHTML = `
-      <div class="mr-guard-blocker-content">
-        <div class="mr-guard-blocker-icon">
-          <svg viewBox="0 0 16 16" fill="currentColor" width="16" height="16">
-            <path fill-rule="evenodd" d="M10 1H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2zM6 0a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h4a3 3 0 0 0 3-3V3a3 3 0 0 0-3-3H6zm2 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4zm0 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z" />
-          </svg>
-        </div>
-        <div class="mr-guard-blocker-text">
-          <h3>Merge blocked</h3>
-          <p>${reason}</p>
-        </div>
-      </div>
-    `;
+    // Create elements safely without innerHTML
+    const content = document.createElement('div');
+    content.className = 'mr-guard-blocker-content';
+    
+    const iconDiv = document.createElement('div');
+    iconDiv.className = 'mr-guard-blocker-icon';
+    
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('viewBox', '0 0 16 16');
+    svg.setAttribute('fill', 'currentColor');
+    svg.setAttribute('width', '16');
+    svg.setAttribute('height', '16');
+    
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('fill-rule', 'evenodd');
+    path.setAttribute('d', 'M10 1H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2zM6 0a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h4a3 3 0 0 0 3-3V3a3 3 0 0 0-3-3H6zm2 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4zm0 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z');
+    
+    svg.appendChild(path);
+    iconDiv.appendChild(svg);
+    
+    const textDiv = document.createElement('div');
+    textDiv.className = 'mr-guard-blocker-text';
+    
+    const h3 = document.createElement('h3');
+    h3.textContent = 'Merge blocked';
+    
+    const p = document.createElement('p');
+    p.textContent = reason;
+    
+    textDiv.appendChild(h3);
+    textDiv.appendChild(p);
+    content.appendChild(iconDiv);
+    content.appendChild(textDiv);
+    blocker.appendChild(content);
     
     // Insert before the button (which is now invisible but still in DOM)
     button.parentNode.insertBefore(blocker, button);
