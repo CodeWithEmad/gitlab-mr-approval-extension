@@ -8,21 +8,15 @@
     "48": "icon-48.png",
     "128": "icon-128.png"
   },
-  "permissions": [
-    "activeTab",
-    "scripting"
-  ],
+  "permissions": ["activeTab", "scripting"],
   "content_scripts": [
     {
-      "matches": [
-        "*://gitlab.com/*",
-        "*://*/*"
-      ],
+      "matches": ["https://gitlab.com/*"],
       "js": ["content.js"],
       "css": ["styles.css"]
     }
   ],
-   "browser_specific_settings": {
+  "browser_specific_settings": {
     "gecko": {
       "id": "gitlab-mr-approval-guard@codewithemad.ir",
       "data_collection_permissions": {
