@@ -3,49 +3,58 @@
 
 ![GitLab MR Approval Guard in action](https://raw.githubusercontent.com/CodeWithEmad/gitlab-mr-approval-extension/main/images/banner.png)
 
-This Extension enforces strict approval rules on GitLab Merge Requests and provides critical warnings when merging into protected branches.
+A lightweight browser extension that brings **merge request approval enforcement** to your team—helping prevent accidental merges and ensuring code quality. Enjoy **GitLab Premium-level safeguards for free**.
 
 ## Features
 
-1. **Approval Enforcement**: Prevents the "Merge" button from being clickable unless at least **1 approval** is detected.
-2. **Critical Branch Warnings**: Displays a prominent, non-dismissible banner at the top of the page when merging into:
-    * `main`
-    * `master`
-    * `production`
-    * `development` / `dev`
-    * `staging`
-    * `nightly`
+* **Block merge button until approval:** Prevents merging until at least one team member has approved the MR.
+* **Custom banners:** Reminds contributors to:
 
-    The banner reminds you to:
-    * Get a review.
-    * Post in related channels.
-    * Ensure a DevOps team member is present.
+  * Get a review from another team member
+  * Post updates in relevant channels
+  * Ensure a DevOps member is involved when needed
+* **Branch protection:** Configure which branches should be protected directly in your team’s browsers.
+* **Easy setup:** Works instantly without modifying GitLab server settings.
 
 ## Installation
 
-1. Clone or download this repository.
-
-### Google Chrome
-
-1. Open Chrome and navigate to `chrome://extensions/`.
-2. Enable **Developer mode** (toggle in the top right).
-3. Click **Load unpacked**.
-4. Select the folder where you cloned this repository.
-
-### Mozilla Firefox
-
-#### Installation (Permanent)
-
-1. Visit the [Firefox Add-ons page](https://addons.mozilla.org/en-US/firefox/addon/gitlab-mr-approval-guard/).
-2. Click **Add to Firefox**.
-
-#### Debugging (Temporary)
-
-1. Open Firefox and navigate to `about:debugging`.
-2. Click on **This Firefox** in the sidebar.
-3. Click **Load Temporary Add-on...**.
-4. Select the `manifest.json` file from this repository.
+* **Chrome Web Store:** [GitLab MR Approval Guard on Chrome Web Store](https://chromewebstore.google.com/detail/gitlab-mr-approval-guard/gkkmbokndbfihjbkcfmhmccboleeegjm) — enforces approval rules and displays a persistent reminder banner on GitLab merge requests.
+* **Firefox Add‑ons:** [GitLab MR Approval Guard on Firefox Add‑ons](https://addons.mozilla.org/en-US/firefox/addon/gitlab-mr-approval-guard) — a lightweight browser extension that blocks merging without approvals and shows a warning banner for protected branches.
 
 ## Usage
 
-Navigate to any GitLab Merge Request. The extension will automatically activate.
+Once installed, the extension will:
+
+* Display a banner on top of the MR page
+* Block the merge button until the MR has at least one approval
+* Remind contributors to follow team review guidelines
+
+You can configure branch protection and banner behavior in the extension settings.
+
+## Why Use This Extension?
+
+Even minor oversights in the review process can cause production issues. This extension:
+
+* Standardizes review practices
+* Improves team collaboration
+* Reduces risk of accidental merges
+* Saves your team from costly mistakes
+
+All the benefits of **GitLab Premium Merge Request Approvals**, available freely.
+
+## Demo
+
+![Merge Request Approval Guard in Action](./demo-screenshot.png)
+*The merge button is blocked and the banner reminds the contributor to get approval before merging.*
+
+## Contributing
+
+Contributions are welcome! Feel free to:
+
+* Open issues for bugs or feature requests
+* Submit pull requests for enhancements
+* Share your feedback and use cases
+
+## License
+
+MIT License © 2026
