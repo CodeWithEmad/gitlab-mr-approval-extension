@@ -11,6 +11,10 @@ on:
         type: boolean
         default: true
 
+# Add this to force GitHub actions to use Node 24
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
     name: Build extension zip
@@ -47,7 +51,7 @@ jobs:
           client-id: ${{ secrets.CHROME_CLIENT_ID }}
           client-secret: ${{ secrets.CHROME_CLIENT_SECRET }}
           refresh-token: ${{ secrets.CHROME_REFRESH_TOKEN }}
-          publish: true # Add this if you want it to immediately go live
+          publish: true
 
   publish-firefox:
     name: Publish to Firefox Add-ons
@@ -59,12 +63,12 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: extension-zip
-          path: extension-dir # Extract the zip into a folder
+          path: extension-dir
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24" # Upgraded to 24 to stay current
 
       - name: Install web-ext
         run: npm install --global web-ext
