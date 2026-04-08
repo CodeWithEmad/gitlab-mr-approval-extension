@@ -44,7 +44,7 @@ All the benefits of **GitLab Premium Merge Request Approvals**, available freely
 
 ## Demo
 
-![Merge Request Approval Guard in Action](./demo-screenshot.png)
+![Merge Request Approval Guard in Action](./images/screenshots/screenshot-1.png)
 *The merge button is blocked and the banner reminds the contributor to get approval before merging.*
 
 ## Contributing
