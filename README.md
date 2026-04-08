@@ -1,4 +1,7 @@
-# GitLab MR Approval Guard
+[![GitHub](https://img.shields.io/github/license/codewithemad/gitlab-mr-approval-extension)](https://github.com/CodeWithEmad/gitlab-mr-approval-extension/blob/main/LICENSE)
+[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/codewithemad/gitlab-mr-approval-extension)](https://github.com/CodeWithEmad/gitlab-mr-approval-extension/releases/latest)
+
+![GitLab MR Approval Guard in action](https://raw.githubusercontent.com/CodeWithEmad/gitlab-mr-approval-extension/main/images/banner.png)
 
 This Extension enforces strict approval rules on GitLab Merge Requests and provides critical warnings when merging into protected branches.
 
