@@ -57,4 +57,4 @@ Contributions are welcome! Feel free to:
 
 ## License
 
-MIT License © 2026
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
