@@ -55,6 +55,10 @@ Contributions are welcome! Feel free to:
 * Submit pull requests for enhancements
 * Share your feedback and use cases
 
+## Privacy Policy
+
+Please see our [Privacy Policy](PRIVACY_POLICY.md) for details on data collection and usage.
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
