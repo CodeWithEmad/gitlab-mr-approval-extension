@@ -9,7 +9,11 @@
     "128": "images/icon-128.png",
     "256": "images/icon-256.png"
   },
-  "permissions": ["activeTab", "scripting"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "GitLab MR Guard Settings"
+  },
+  "permissions": ["activeTab", "scripting", "storage"],
   "content_scripts": [
     {
       "matches": ["https://gitlab.com/*"],

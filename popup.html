@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MR Guard Settings</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      width: 340px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: #1a1a2e;
+      color: #e2e8f0;
+      font-size: 13px;
+    }
+
+    header {
+      background: #7f1d1d;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 3px solid #ef4444;
+    }
+
+    header .logo { font-size: 1.4rem; }
+
+    header h1 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: #fff;
+    }
+
+    header p {
+      font-size: 0.7rem;
+      color: #fca5a5;
+      margin-top: 1px;
+    }
+
+    main { padding: 14px 16px; display: flex; flex-direction: column; gap: 18px; }
+
+    .section-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #94a3b8;
+      margin-bottom: 6px;
+    }
+
+    /* Number input */
+    .number-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .number-row input[type="number"] {
+      width: 70px;
+      padding: 6px 8px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      color: #e2e8f0;
+      font-size: 0.9rem;
+      text-align: center;
+      outline: none;
+    }
+
+    .number-row input[type="number"]:focus { border-color: #ef4444; }
+
+    /* Tag input */
+    .tag-box {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      padding: 6px 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      min-height: 38px;
+      cursor: text;
+      transition: border-color 0.15s;
+    }
+
+    .tag-box:focus-within { border-color: #ef4444; }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #7f1d1d;
+      color: #fca5a5;
+      border-radius: 4px;
+      padding: 2px 7px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .tag button {
+      background: none;
+      border: none;
+      color: #fca5a5;
+      cursor: pointer;
+      font-size: 0.85rem;
+      line-height: 1;
+      padding: 0 1px;
+      opacity: 0.7;
+      transition: opacity 0.1s;
+    }
+
+    .tag button:hover { opacity: 1; }
+
+    .tag-input {
+      border: none;
+      outline: none;
+      background: transparent;
+      color: #e2e8f0;
+      font-size: 0.8rem;
+      flex: 1;
+      min-width: 90px;
+    }
+
+    .tag-hint {
+      font-size: 0.67rem;
+      color: #64748b;
+      margin-top: 4px;
+    }
+
+    /* Save button */
+    .btn-save {
+      width: 100%;
+      padding: 9px;
+      background: #ef4444;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      transition: background 0.15s;
+    }
+
+    .btn-save:hover { background: #dc2626; }
+
+    /* Toast */
+    #toast {
+      display: none;
+      background: #166534;
+      color: #bbf7d0;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    footer a {
+      
+      padding: 10px 16px;
+      border-top: 1px solid #1e293b;
+      text-align: center;
+      font-size: 0.65rem;
+      color: #475569;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">🛡️</div>
+    <div>
+      <h1>MR Guard</h1>
+      <p>Configure merge protection rules</p>
+    </div>
+  </header>
+
+  <main>
+    <!-- Required Approvals -->
+    <div>
+      <div class="section-label">Required Approvals</div>
+      <div class="number-row">
+        <input type="number" id="required-approvals" min="1" max="99" value="1" />
+        <span id="approvals-label" style="color:#94a3b8; font-size:0.78rem;">approval before merge</span>
+      </div>
+    </div>
+
+    <!-- Critical Branches -->
+    <div>
+      <div class="section-label">Critical Branches</div>
+      <div class="tag-box" id="branches-box">
+        <input class="tag-input" id="branch-input" type="text" placeholder="Add branch…" />
+      </div>
+      <div class="tag-hint">Press Enter or comma to add</div>
+    </div>
+
+    <!-- Required Actions (checklist items) -->
+    <div>
+      <div class="section-label">Required Actions Checklist</div>
+      <div class="tag-box" id="actions-box">
+        <input class="tag-input" id="action-input" type="text" placeholder="Add action…" />
+      </div>
+      <div class="tag-hint">Press Enter or comma to add</div>
+    </div>
+
+    <div id="toast">✅ Settings saved!</div>
+
+    <button class="btn-save" id="save-btn">Save Settings</button>
+  </main>
+
+  <footer><a href="https://github.com/CodeWithEmad/gitlab-mr-approval-extension">GitLab MR Approval Guard</a></footer>
+
+  <script src="popup.js"></script>
+</body>
+</html>
