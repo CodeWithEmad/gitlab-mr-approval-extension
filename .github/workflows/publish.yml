@@ -24,7 +24,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Create extension zip
-        run: zip -r extension.zip . -x "*.git*" -x ".github/*" -x "images/*" -x "*.md"
+        run: zip -r extension.zip * -x "*.git*" -x ".github/*" -x "images/screenshots/*" -x "*.md"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -76,7 +76,9 @@ jobs:
       - name: Sign and submit to AMO
         run: |
           cd extension-dir
+          unzip extension.zip
           web-ext sign \
             --api-key=${{ secrets.FIREFOX_API_KEY }} \
             --api-secret=${{ secrets.FIREFOX_API_SECRET }} \
+            --source-dir=. \
             --channel=listed
