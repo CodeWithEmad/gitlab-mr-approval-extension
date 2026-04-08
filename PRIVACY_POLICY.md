@@ -1,6 +1,6 @@
 # Privacy Policy for GitLab MR Approval Guard
 
-**Last Updated: February 17, 2026**
+**Last Updated: April 8, 2026**
 
 ## Data Collection
 
@@ -17,10 +17,15 @@ This extension operates entirely locally in your browser and:
 
 ## Data Storage
 
-No data is stored locally or remotely. The extension does not use:
+GitLab MR Approval Guard uses your browser's sync storage (`chrome.storage.sync`) solely to save your customized settings, which include:
+
+- Critical branch names
+- Number of required approvals
+- Required checklist actions
+
+This data remains securely tied to your browser profile and is not transmitted to our servers or any third parties. The extension does not use:
 
 - Cookies
-- Local storage
 - External servers
 - Analytics services
 - Tracking mechanisms
@@ -34,6 +39,7 @@ This extension does not communicate with any third-party services or external se
 - **activeTab**: To inject scripts into GitLab pages you're currently viewing
 - **Host permissions** (`*://gitlab.com/*` and similar): To access GitLab domains and read page content to enforce approval rules
 - **scripting**: To modify the merge button state and display warning banners
+- **storage**: To save your custom extension preferences (e.g., critical branches, required approvals, and actions)
 
 All processing happens locally in your browser. No data leaves your machine.
 
