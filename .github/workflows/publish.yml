@@ -11,23 +11,19 @@ on:
         type: boolean
         default: true
 
-# Add this to force GitHub actions to use Node 24
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 jobs:
   build:
     name: Build extension zip
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Create extension zip
         run: zip -r extension.zip * -x "*.git*" -x ".github/*" -x "images/screenshots/*" -x "*.md"
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: extension-zip
           path: extension.zip
@@ -39,7 +35,7 @@ jobs:
     if: ${{ inputs.dry_run != true }}
     steps:
       - name: Download artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: extension-zip
 
@@ -60,7 +56,7 @@ jobs:
     if: ${{ inputs.dry_run != true }}
     steps:
       - name: Download artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: extension-zip
           path: extension-dir
