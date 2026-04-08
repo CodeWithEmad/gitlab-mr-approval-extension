@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "GitLab MR Approval Guard",
-  "version": "1.0",
+  "version": "2.0",
   "description": "A lightweight extension that enforces merge discipline by blocking the merge button until at least one approval is received—bringing Premium-level safeguards to any team, for free.",
   "icons": {
     "16": "images/icon-16.png",
