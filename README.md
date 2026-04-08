@@ -57,7 +57,7 @@ Contributions are welcome! Feel free to:
 
 ## Privacy Policy
 
-Please see our [Privacy Policy](PRIVACY_POLICY.md) for details on data collection and usage.
+Please see our [Privacy Policy](privacy.md) for details on data collection and usage.
 
 ## License
 
