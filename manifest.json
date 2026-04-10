@@ -13,7 +13,7 @@
     "default_popup": "popup.html",
     "default_title": "GitLab MR Guard Settings"
   },
-  "permissions": ["activeTab", "storage"],
+  "permissions": ["storage"],
   "content_scripts": [
     {
       "matches": ["https://gitlab.com/*"],
