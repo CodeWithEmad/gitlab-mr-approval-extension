@@ -36,7 +36,6 @@ This extension does not communicate with any third-party services or external se
 
 ## Permissions Used
 
-- **activeTab**: To inject scripts into GitLab pages you're currently viewing
 - **Host permissions** (`*://gitlab.com/*` and similar): To access GitLab domains and read page content to enforce approval rules
 - **scripting**: To modify the merge button state and display warning banners
 - **storage**: To save your custom extension preferences (e.g., critical branches, required approvals, and actions)
