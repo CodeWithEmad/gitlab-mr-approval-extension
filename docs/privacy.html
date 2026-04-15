@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy — GitLab MR Approval Guard</title>
+  <meta name="description" content="Privacy policy for GitLab MR Approval Guard. No data collected, no external servers, 100% local." />
+  <link rel="icon" href="https://raw.githubusercontent.com/CodeWithEmad/gitlab-mr-approval-extension/main/images/icon-128.png" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gl-orange: #FC6D26;
+      --bg-dark: #0D0E14;
+      --bg-card: #161822;
+      --border: rgba(255,255,255,0.08);
+      --text-primary: #F0F0F5;
+      --text-secondary: #9090A8;
+      --text-muted: #606078;
+      --green: #4ade80;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      line-height: 1.7;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      height: 64px;
+      background: rgba(13,14,20,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--text-primary);
+      text-decoration: none;
+    }
+    .nav-logo img { width: 28px; height: 28px; border-radius: 6px; }
+    .nav-back {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      font-size: .875rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .nav-back:hover { color: var(--text-primary); }
+    .nav-back svg { width: 16px; height: 16px; }
+
+    /* ── HERO ── */
+    .hero {
+      text-align: center;
+      padding: 4rem 1.5rem 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 70% 50% at 50% -10%, rgba(252,109,38,.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-label {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      padding: .3rem .9rem;
+      border-radius: 99px;
+      border: 1px solid rgba(252,109,38,.3);
+      background: rgba(252,109,38,.07);
+      color: var(--gl-orange);
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: 1.25rem;
+    }
+    h1 {
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      font-weight: 800;
+      letter-spacing: -.03em;
+      margin-bottom: .6rem;
+    }
+    .hero-sub {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      margin-bottom: .5rem;
+    }
+    .updated-tag {
+      display: inline-block;
+      padding: .25rem .75rem;
+      border-radius: 6px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--border);
+      font-size: .8rem;
+      color: var(--text-muted);
+      margin-top: .5rem;
+    }
+
+    /* ── SUMMARY CHIPS ── */
+    .summary-chips {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: .65rem;
+      padding: 1.75rem 1.5rem 2.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: .45rem;
+      padding: .5rem 1rem;
+      border-radius: 99px;
+      background: rgba(74,222,128,.07);
+      border: 1px solid rgba(74,222,128,.18);
+      color: var(--green);
+      font-size: .83rem;
+      font-weight: 600;
+    }
+    .chip svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+    /* ── CONTENT ── */
+    .content-wrap {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 3.5rem 1.5rem 5rem;
+    }
+
+    .policy-section {
+      margin-bottom: 2.75rem;
+    }
+
+    .policy-section h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+      padding-bottom: .6rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+    }
+    .policy-section h2 .icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: rgba(252,109,38,.1);
+      border: 1px solid rgba(252,109,38,.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .policy-section h2 .icon svg {
+      width: 15px;
+      height: 15px;
+      color: var(--gl-orange);
+    }
+
+    .policy-section p {
+      color: var(--text-secondary);
+      font-size: .95rem;
+      margin-bottom: .75rem;
+    }
+    .policy-section p:last-child { margin-bottom: 0; }
+
+    .policy-section ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
+    }
+    .policy-section ul li {
+      display: flex;
+      align-items: flex-start;
+      gap: .6rem;
+      color: var(--text-secondary);
+      font-size: .95rem;
+    }
+    .policy-section ul li::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--gl-orange);
+      margin-top: .55rem;
+      flex-shrink: 0;
+    }
+
+    /* permission list style */
+    .perm-list { list-style: none; display: flex; flex-direction: column; gap: .75rem; }
+    .perm-list li {
+      padding: .85rem 1rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: .9rem;
+      color: var(--text-secondary);
+      display: flex;
+      flex-direction: column;
+      gap: .2rem;
+    }
+    .perm-list li::before { display: none; }
+    .perm-name {
+      font-weight: 700;
+      color: var(--text-primary);
+      font-size: .88rem;
+    }
+    code {
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+      background: rgba(255,255,255,.07);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: .1em .4em;
+      font-size: .85em;
+      color: #e2a05a;
+    }
+
+    .highlight-box {
+      padding: 1.1rem 1.25rem;
+      background: rgba(74,222,128,.05);
+      border: 1px solid rgba(74,222,128,.15);
+      border-radius: 10px;
+      color: var(--text-secondary);
+      font-size: .9rem;
+      display: flex;
+      gap: .75rem;
+      align-items: flex-start;
+    }
+    .highlight-box svg { width: 18px; height: 18px; color: var(--green); margin-top: 1px; flex-shrink: 0; }
+
+    .compliance-list { list-style: none; display: flex; flex-direction: column; gap: .5rem; }
+    .compliance-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: .6rem;
+      color: var(--text-secondary);
+      font-size: .95rem;
+    }
+    .compliance-list li svg { width: 16px; height: 16px; color: var(--green); margin-top: .2rem; flex-shrink: 0; }
+    .compliance-list li::before { display: none; }
+
+    a.email-link {
+      color: var(--gl-orange);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    a.email-link:hover { text-decoration: underline; }
+
+    strong { color: var(--text-primary); font-weight: 600; }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 2rem 2rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      font-size: .9rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+    }
+    .footer-logo img { width: 22px; height: 22px; border-radius: 5px; }
+    .footer-links { display: flex; gap: 1.5rem; }
+    .footer-links a {
+      font-size: .85rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .footer-links a:hover { color: var(--text-secondary); }
+    .footer-copy { font-size: .8rem; color: var(--text-muted); }
+
+    @media (max-width: 600px) {
+      nav { padding: 0 1rem; }
+      footer { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="./index.html" class="nav-logo">
+    <img src="https://raw.githubusercontent.com/CodeWithEmad/gitlab-mr-approval-extension/main/images/icon-128.png" alt="icon" />
+    MR Approval Guard
+  </a>
+  <a href="./index.html" class="nav-back">
+    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M7.78 12.53a.75.75 0 0 1-1.06 0L2.47 8.28a.75.75 0 0 1 0-1.06l4.25-4.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042L4.81 7h7.44a.75.75 0 0 1 0 1.5H4.81l2.97 2.97a.75.75 0 0 1 0 1.06Z"/></svg>
+    Back to home
+  </a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-label">Legal</div>
+  <h1>Privacy Policy</h1>
+  <p class="hero-sub">GitLab MR Approval Guard — we keep it simple: we collect nothing.</p>
+  <span class="updated-tag">Last updated: April 8, 2026</span>
+</div>
+
+<!-- SUMMARY CHIPS -->
+<div class="summary-chips">
+  <div class="chip">
+    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
+    No data collected
+  </div>
+  <div class="chip">
+    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
+    No external servers
+  </div>
+  <div class="chip">
+    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
+    No cookies or tracking
+  </div>
+  <div class="chip">
+    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
+    100% local processing
+  </div>
+  <div class="chip">
+    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
+    GDPR compliant
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="content-wrap">
+
+  <!-- Data Collection -->
+  <div class="policy-section">
+    <h2>
+      <span class="icon">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1a3.5 3.5 0 0 0-3.5 3.5V7H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1h-1.5V4.5A3.5 3.5 0 0 0 8 1Z"/></svg>
+      </span>
+      Data Collection
+    </h2>
+    <div class="highlight-box">
+      <svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
+      <span>GitLab MR Approval Guard does <strong>not</strong> collect, store, or transmit any personal data or user information.</span>
+    </div>
+  </div>
+
+  <!-- What the Extension Does -->
+  <div class="policy-section">
+    <h2>
+      <span class="icon">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 1.5"/></svg>
+      </span>
+      What the Extension Does
+    </h2>
+    <p>This extension operates entirely locally in your browser and:</p>
+    <ul>
+      <li>Reads approval counts from GitLab merge request pages</li>
+      <li>Detects protected branch names (<code>main</code>, <code>master</code>, <code>production</code>, <code>development</code>, <code>staging</code>, <code>nightly</code>)</li>
+      <li>Modifies the merge button behavior based on approval status</li>
+      <li>Displays warning banners for protected branches</li>
+    </ul>
+  </div>
+
+  <!-- Data Storage -->
+  <div class="policy-section">
+    <h2>
+      <span class="icon">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="8" cy="5" rx="6" ry="2.5"/><path d="M2 5v6c0 1.38 2.69 2.5 6 2.5s6-1.12 6-2.5V5"/><path d="M2 8c0 1.38 2.69 2.5 6 2.5s6-1.12 6-2.5"/></svg>
+      </span>
+      Data Storage
+    </h2>
+    <p>GitLab MR Approval Guard uses your browser's sync storage (<code>chrome.storage.sync</code>) solely to save your customized settings, which include:</p>
+    <ul>
+      <li>Critical branch names</li>
+      <li>Number of required approvals</li>
+      <li>Required checklist actions</li>
+    </ul>
+    <p style="margin-top: 1rem;">This data remains securely tied to your browser profile and is not transmitted to our servers or any third parties. The extension does <strong>not</strong> use:</p>
+    <ul>
+      <li>Cookies</li>
+      <li>External servers</li>
+      <li>Analytics services</li>
+      <li>Tracking mechanisms</li>
+    </ul>
+  </div>
+
+  <!-- Third-Party Services -->
+  <div class="policy-section">
+    <h2>
+      <span class="icon">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8Z"/><path d="M8 5v3l2 1"/></svg>
+      </span>
+      Third-Party Services
+    </h2>
+    <p>This extension does not communicate with any third-party services or external servers. All functionality is self-contained within the extension.</p>
+  </div>
+
+  <!-- Permissions Used -->
+  <div class="policy-section">
+    <h2>
+      <span class="icon">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1.5a4 4 0 0 0-4 4V7H3a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1h-1V5.5a4 4 0 0 0-4-4Z"/></svg>
+      </span>
+      Permissions Used
+    </h2>
+    <ul class="perm-list">
+      <li>
+        <span class="perm-name">Host permissions — <code>*://gitlab.com/*</code></span>
+        To access GitLab domains and read page content to enforce approval rules.
+      </li>
+      <li>
+        <span class="perm-name">scripting</span>
+        To modify the merge button state and display warning banners on GitLab MR pages.
+      </li>
+      <li>
+        <span class="perm-name">storage</span>
+        To save your custom extension preferences (e.g., critical branches, required approvals, and actions).
+      </li>
+    </ul>
+    <div class="highlight-box" style="margin-top: 1.25rem;">
+      <svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
+      <span>All processing happens locally in your browser. <strong>No data leaves your machine.</strong></span>
+    </div>
+  </div>
+
+  <!-- Changes to This Policy -->
+  <div class="policy-section">
+    <h2>
+      <span class="icon">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8Zm7-3v3l2 1"/></svg>
+      </span>
+      Changes to This Policy
+    </h2>
+    <p>Any updates to this privacy policy will be reflected in the extension's <a href="https://github.com/CodeWithEmad/gitlab-mr-approval-extension" target="_blank" rel="noopener" class="email-link">GitHub repository</a> and updated in the Chrome Web Store listing.</p>
+  </div>
+
+  <!-- Contact -->
+  <div class="policy-section">
+    <h2>
+      <span class="icon">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 3.5h13a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-13a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1Z"/><polyline points="1.5,3.5 8,9 14.5,3.5"/></svg>
+      </span>
+      Contact
+    </h2>
+    <p>For questions or concerns about this privacy policy, contact: <a href="mailto:emad.ehsanrad@gmail.com" class="email-link">emad.ehsanrad@gmail.com</a></p>
+  </div>
+
+  <!-- Compliance -->
+  <div class="policy-section">
+    <h2>
+      <span class="icon">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1.5 2 4v4c0 3.31 2.69 6 6 7 3.31-1 6-3.69 6-7V4L8 1.5Z"/></svg>
+      </span>
+      Compliance
+    </h2>
+    <ul class="compliance-list">
+      <li>
+        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
+        Chrome Web Store Developer Program Policies
+      </li>
+      <li>
+        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
+        General Data Protection Regulation (GDPR)
+      </li>
+      <li>
+        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
+        No user data is collected, therefore no data processing occurs
+      </li>
+    </ul>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <a href="./index.html" class="footer-logo">
+    <img src="https://raw.githubusercontent.com/CodeWithEmad/gitlab-mr-approval-extension/main/images/icon-128.png" alt="icon" />
+    GitLab MR Approval Guard
+  </a>
+  <div class="footer-links">
+    <a href="https://github.com/CodeWithEmad/gitlab-mr-approval-extension" target="_blank" rel="noopener">GitHub</a>
+    <a href="./privacy.html">Privacy</a>
+    <a href="https://github.com/CodeWithEmad/gitlab-mr-approval-extension/blob/main/LICENSE" target="_blank" rel="noopener">License</a>
+    <a href="https://github.com/CodeWithEmad/gitlab-mr-approval-extension/issues" target="_blank" rel="noopener">Issues</a>
+  </div>
+  <span class="footer-copy">© 2026 CodeWithEmad · MIT License</span>
+</footer>
+
+</body>
+</html>
