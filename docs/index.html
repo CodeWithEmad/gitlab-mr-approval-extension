@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GitLab MR Approval Guard — Free Merge Request Enforcement</title>
+  <meta name="description" content="A lightweight browser extension that blocks the GitLab merge button until your team has approved, bringing Premium-level safeguards to any team for free." />
+  <meta property="og:title" content="GitLab MR Approval Guard" />
+  <meta property="og:description" content="Prevent accidental merges. Enforce code review. Free for every team." />
+  <meta property="og:image" content="https://raw.githubusercontent.com/CodeWithEmad/gitlab-mr-approval-extension/main/images/banner.png" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" href="https://raw.githubusercontent.com/CodeWithEmad/gitlab-mr-approval-extension/main/images/icon-128.png" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gl-orange: #FC6D26;
+      --gl-purple: #6B4FBB;
+      --bg-dark: #0D0E14;
+      --bg-card: #161822;
+      --bg-card-hover: #1e2030;
+      --border: rgba(255,255,255,0.08);
+      --text-primary: #F0F0F5;
+      --text-secondary: #9090A8;
+      --text-muted: #606078;
+      --chrome-blue: #4285F4;
+      --firefox-orange: #FF7139;
+      --green: #2DA44E;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      height: 64px;
+      background: rgba(13,14,20,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--text-primary);
+      text-decoration: none;
+    }
+    .nav-logo img { width: 28px; height: 28px; border-radius: 6px; }
+    .nav-links { display: flex; align-items: center; gap: 1.5rem; }
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: .9rem;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--text-primary); }
+    .btn-nav {
+      padding: .45rem 1.1rem;
+      border-radius: 8px;
+      background: var(--gl-orange);
+      color: #fff !important;
+      font-weight: 600;
+      font-size: .85rem;
+      transition: opacity .2s, transform .15s;
+    }
+    .btn-nav:hover { opacity: .85; transform: translateY(-1px); }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      text-align: center;
+      padding: 6rem 1.5rem 5rem;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(252,109,38,.18) 0%, transparent 70%),
+                  radial-gradient(ellipse 50% 40% at 80% 80%, rgba(107,79,187,.12) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      padding: .3rem .9rem;
+      border-radius: 99px;
+      border: 1px solid rgba(252,109,38,.35);
+      background: rgba(252,109,38,.08);
+      color: var(--gl-orange);
+      font-size: .8rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      letter-spacing: .03em;
+    }
+    .badge svg { width: 14px; height: 14px; }
+    h1 {
+      font-size: clamp(2.2rem, 6vw, 3.8rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -.03em;
+      max-width: 740px;
+      margin: 0 auto .6rem;
+    }
+    h1 span {
+      background: linear-gradient(135deg, var(--gl-orange) 0%, #ff9a56 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-sub {
+      font-size: clamp(1rem, 2.5vw, 1.2rem);
+      color: var(--text-secondary);
+      max-width: 560px;
+      margin: 0 auto 2.5rem;
+    }
+    .hero-ctas {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 3rem;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .55rem;
+      padding: .75rem 1.6rem;
+      border-radius: 10px;
+      font-size: .95rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: transform .15s, opacity .2s, box-shadow .2s;
+      cursor: pointer;
+      border: none;
+    }
+    .btn:hover { transform: translateY(-2px); opacity: .92; }
+    .btn-chrome {
+      background: var(--chrome-blue);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(66,133,244,.3);
+    }
+    .btn-chrome:hover { box-shadow: 0 8px 28px rgba(66,133,244,.45); }
+    .btn-firefox {
+      background: var(--firefox-orange);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(255,113,57,.3);
+    }
+    .btn-firefox:hover { box-shadow: 0 8px 28px rgba(255,113,57,.45); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { color: var(--text-primary); border-color: rgba(255,255,255,.2); }
+    .btn svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+    .hero-img {
+      max-width: min(860px, 95vw);
+      margin: 0 auto;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 24px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.04);
+    }
+    .hero-img img { width: 100%; display: block; }
+
+    /* ── STATS BAR ── */
+    .stats-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2.5rem;
+      flex-wrap: wrap;
+      padding: 2.5rem 2rem;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .stat { text-align: center; }
+    .stat-num {
+      display: block;
+      font-size: 1.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--gl-orange), #ff9a56);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .stat-label { font-size: .82rem; color: var(--text-secondary); font-weight: 500; }
+    .stats-divider { width: 1px; height: 40px; background: var(--border); }
+
+    /* ── SECTION ── */
+    section { padding: 5rem 1.5rem; }
+    .section-label {
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--gl-orange);
+      margin-bottom: .8rem;
+    }
+    .section-title {
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 800;
+      letter-spacing: -.02em;
+      line-height: 1.15;
+      margin-bottom: 1rem;
+    }
+    .section-sub {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+    .section-header { text-align: center; margin-bottom: 3.5rem; }
+
+    /* ── FEATURES ── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.25rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .feature-card {
+      padding: 1.75rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      transition: background .2s, border-color .2s, transform .2s;
+    }
+    .feature-card:hover {
+      background: var(--bg-card-hover);
+      border-color: rgba(255,255,255,.14);
+      transform: translateY(-3px);
+    }
+    .feature-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: rgba(252,109,38,.12);
+      border: 1px solid rgba(252,109,38,.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.1rem;
+    }
+    .feature-icon svg { width: 22px; height: 22px; color: var(--gl-orange); }
+    .feature-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: .5rem; }
+    .feature-card p { color: var(--text-secondary); font-size: .9rem; line-height: 1.6; }
+
+    /* ── HOW IT WORKS ── */
+    #how-it-works { background: rgba(255,255,255,.015); }
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      max-width: 680px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .steps::before {
+      content: '';
+      position: absolute;
+      left: 22px;
+      top: 44px;
+      bottom: 44px;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--gl-orange), var(--gl-purple));
+      border-radius: 2px;
+    }
+    .step {
+      display: flex;
+      gap: 1.5rem;
+      align-items: flex-start;
+      padding: 1.5rem 0;
+    }
+    .step-num {
+      width: 46px;
+      height: 46px;
+      flex-shrink: 0;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gl-orange), #e85d10);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: .95rem;
+      color: #fff;
+      position: relative;
+      z-index: 1;
+      box-shadow: 0 0 0 4px var(--bg-dark);
+    }
+    .step-body h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: .35rem; }
+    .step-body p { color: var(--text-secondary); font-size: .9rem; }
+
+    /* ── SCREENSHOT ── */
+    .screenshot-wrap {
+      max-width: 860px;
+      margin: 0 auto;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 20px 60px rgba(0,0,0,.5);
+    }
+    .screenshot-wrap img { width: 100%; display: block; }
+
+    /* ── PRIVACY ── */
+    #privacy { text-align: center; }
+    .privacy-chips {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: .75rem;
+      margin-top: 2rem;
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .55rem 1.1rem;
+      border-radius: 99px;
+      background: rgba(45,164,78,.08);
+      border: 1px solid rgba(45,164,78,.2);
+      color: #4ade80;
+      font-size: .85rem;
+      font-weight: 600;
+    }
+    .chip svg { width: 15px; height: 15px; }
+
+    /* ── INSTALL CTA ── */
+    #install {
+      background: linear-gradient(135deg, rgba(252,109,38,.06) 0%, rgba(107,79,187,.06) 100%);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      text-align: center;
+    }
+    .install-browsers {
+      display: flex;
+      justify-content: center;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+      margin-top: 2.5rem;
+    }
+    .browser-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      padding: 2rem 2.5rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      text-decoration: none;
+      color: var(--text-primary);
+      transition: transform .2s, border-color .2s, box-shadow .2s;
+      min-width: 200px;
+    }
+    .browser-card:hover { transform: translateY(-4px); border-color: rgba(255,255,255,.18); box-shadow: 0 16px 40px rgba(0,0,0,.4); }
+    .browser-card svg { width: 52px; height: 52px; }
+    .browser-card-name { font-weight: 700; font-size: 1rem; }
+    .browser-card-sub { font-size: .8rem; color: var(--text-secondary); }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 2.5rem 2rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      font-size: .9rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+    }
+    .footer-logo img { width: 22px; height: 22px; border-radius: 5px; }
+    .footer-links { display: flex; gap: 1.5rem; }
+    .footer-links a {
+      font-size: .85rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .footer-links a:hover { color: var(--text-secondary); }
+    .footer-copy { font-size: .8rem; color: var(--text-muted); }
+
+    @media (max-width: 600px) {
+      nav { padding: 0 1rem; }
+      .nav-links a:not(.btn-nav):not([href='#install']) { display: none; }
+      .stats-divider { display: none; }
+      .steps::before { display: none; }
+      footer { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">
+    <img src="https://raw.githubusercontent.com/CodeWithEmad/gitlab-mr-approval-extension/main/images/icon-128.png" alt="GitLab MR Approval Guard icon" />
+    MR Approval Guard
+  </a>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#how-it-works">How it works</a>
+    <a href="https://github.com/CodeWithEmad/gitlab-mr-approval-extension" target="_blank" rel="noopener">GitHub</a>
+    <a href="#install" class="btn-nav">Install Free</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="badge">
+    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.751.751 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/></svg>
+    Free &amp; Open Source
+  </div>
+  <h1>Approve before you<br /><span>merge. Always.</span></h1>
+  <p class="hero-sub">A lightweight browser extension that blocks the GitLab merge button until your team approves — bringing Premium-level safeguards to every team, for free.</p>
+  <div class="hero-ctas">
+    <a href="https://chromewebstore.google.com/detail/gitlab-mr-approval-guard/gkkmbokndbfihjbkcfmhmccboleeegjm"
+       class="btn btn-chrome" target="_blank" rel="noopener">
+      <!-- Chrome icon -->
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="4" fill="white"/>
+        <path d="M12 8h8.66a10 10 0 1 0-1.04 9.56L16 12" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        <path d="M12 8 7.27 16.27" stroke="white" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      Add to Chrome
+    </a>
+    <a href="https://addons.mozilla.org/en-US/firefox/addon/gitlab-mr-approval-guard"
+       class="btn btn-firefox" target="_blank" rel="noopener">
+      <!-- Firefox icon -->
+      <svg viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" opacity=".3"/>
+        <path d="M12 4C7.58 4 4 7.58 4 12c0 4.08 3.05 7.44 7 7.93V13h-2v-2.5h2V9c0-2.21 1.79-4 4-4h2v2.5h-1.5c-.83 0-1.5.67-1.5 1.5v1.5H17l-.5 2.5H14v6.93c3.95-.49 7-3.85 7-7.93 0-4.42-3.58-8-9-8z"/>
+      </svg>
+      Add to Firefox
+    </a>
+    <a href="https://github.com/CodeWithEmad/gitlab-mr-approval-extension" class="btn btn-ghost" target="_blank" rel="noopener">
+      <!-- GitHub icon -->
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.605-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.031 1.531 1.031.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.03-2.682-.103-.254-.447-1.27.098-2.646 0 0 .84-.269 2.75 1.026A9.578 9.578 0 0 1 12 6.836c.85.004 1.705.115 2.504.337 1.909-1.295 2.748-1.026 2.748-1.026.546 1.376.202 2.392.1 2.646.64.698 1.028 1.591 1.028 2.682 0 3.841-2.337 4.687-4.565 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+      View Source
+    </a>
+  </div>
+  <div class="hero-img">
+    <img src="https://raw.githubusercontent.com/CodeWithEmad/gitlab-mr-approval-extension/main/images/banner.png" alt="GitLab MR Approval Guard banner" />
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stat">
+    <span class="stat-num">2</span>
+    <span class="stat-label">Browsers Supported</span>
+  </div>
+  <div class="stats-divider"></div>
+  <div class="stat">
+    <span class="stat-num">0</span>
+    <span class="stat-label">Data Collected</span>
+  </div>
+  <div class="stats-divider"></div>
+  <div class="stat">
+    <span class="stat-num">Free</span>
+    <span class="stat-label">Forever</span>
+  </div>
+  <div class="stats-divider"></div>
+  <div class="stat">
+    <span class="stat-num">MIT</span>
+    <span class="stat-label">Open Source License</span>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-header">
+    <div class="section-label">Features</div>
+    <h2 class="section-title">Everything your team needs<br />to merge with confidence</h2>
+    <p class="section-sub">No GitLab Premium required. No changes to your server. Just install and protect your branches.</p>
+  </div>
+  <div class="features-grid">
+
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+      </div>
+      <h3>Block Unreviewed Merges</h3>
+      <p>The merge button stays disabled until at least one team member has approved the MR — no more accidental merges.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+      </div>
+      <h3>Branch Protection</h3>
+      <p>Define which branches are critical — main, master, production, staging — and enforce stricter rules on those alone.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+      </div>
+      <h3>Custom Reminder Banners</h3>
+      <p>Show persistent banners that remind contributors to notify the right channels or involve a DevOps member before merging.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
+        </svg>
+      </div>
+      <h3>Zero Server Changes</h3>
+      <p>Works entirely in your browser. No GitLab admin access needed, no webhooks, no server-side configuration — just install.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+      </div>
+      <h3>Team-Wide Consistency</h3>
+      <p>Every team member who installs the extension follows the same review rules, standardizing your workflow automatically.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/>
+        </svg>
+      </div>
+      <h3>Instant Setup</h3>
+      <p>Install from the Chrome Web Store or Firefox Add-ons in seconds. Configure your branches and required approvals right in the popup.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how-it-works">
+  <div class="section-header">
+    <div class="section-label">How it works</div>
+    <h2 class="section-title">Up and running in minutes</h2>
+    <p class="section-sub">Three simple steps separate your team from safer, reviewed merges.</p>
+  </div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h3>Install the extension</h3>
+        <p>Add GitLab MR Approval Guard from the Chrome Web Store or Firefox Add-ons — no account required.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h3>Configure your branches &amp; rules</h3>
+        <p>Click the extension icon and set which branches to protect, how many approvals you require, and which checklist reminders to show.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h3>Open any GitLab MR</h3>
+        <p>The extension automatically detects the approval count and locks the merge button until your criteria are met — every single time.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SCREENSHOT -->
+<section>
+  <div class="section-header">
+    <div class="section-label">See it in action</div>
+    <h2 class="section-title">Merge blocked. Team protected.</h2>
+    <p class="section-sub">The banner and disabled merge button are always visible — no way to miss them.</p>
+  </div>
+  <div class="screenshot-wrap">
+    <img src="https://raw.githubusercontent.com/CodeWithEmad/gitlab-mr-approval-extension/main/images/screenshots/screenshot-1.png"
+         alt="Extension blocking merge button on a GitLab MR" />
+  </div>
+</section>
+
+<!-- PRIVACY -->
+<section id="privacy">
+  <div class="section-header">
+    <div class="section-label">Privacy</div>
+    <h2 class="section-title">Your data stays yours</h2>
+    <p class="section-sub">GitLab MR Approval Guard runs entirely in your browser. It does not collect, store, or transmit any personal information — ever.</p>
+  </div>
+  <div class="privacy-chips">
+    <div class="chip">
+      <svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
+      No data collected
+    </div>
+    <div class="chip">
+      <svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
+      No external servers
+    </div>
+    <div class="chip">
+      <svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
+      No cookies or tracking
+    </div>
+    <div class="chip">
+      <svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
+      Runs 100% locally
+    </div>
+    <div class="chip">
+      <svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
+      MIT open source
+    </div>
+  </div>
+</section>
+
+<!-- INSTALL CTA -->
+<section id="install">
+  <div class="section-header">
+    <div class="section-label">Get started</div>
+    <h2 class="section-title">Install in your browser today</h2>
+    <p class="section-sub">Available for free on Chrome and Firefox. No GitLab Premium. No credit card. No catch.</p>
+  </div>
+  <div class="install-browsers">
+    <a href="https://chromewebstore.google.com/detail/gitlab-mr-approval-guard/gkkmbokndbfihjbkcfmhmccboleeegjm"
+       class="browser-card" target="_blank" rel="noopener">
+      <!-- Chrome colour SVG -->
+      <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="24" cy="24" r="11" fill="white"/>
+        <path d="M4.53 14h18.93A11 11 0 0 1 35 24H13.06A11 11 0 0 0 4.53 14Z" fill="#1A73E8"/>
+        <path d="M24 13a11 11 0 0 1 9.53 5.5L24 35a11 11 0 0 1 0-22Z" fill="#EA4335" transform="rotate(120 24 24)"/>
+        <path d="M24 13a11 11 0 0 1 9.53 5.5L24 35a11 11 0 0 1 0-22Z" fill="#FBBC04" transform="rotate(240 24 24)"/>
+        <path d="M24 13a11 11 0 0 1 9.53 5.5L24 35a11 11 0 0 1 0-22Z" fill="#1A73E8"/>
+        <circle cx="24" cy="24" r="6" fill="white"/>
+      </svg>
+      <span class="browser-card-name">Chrome</span>
+      <span class="browser-card-sub">Chrome Web Store →</span>
+    </a>
+    <a href="https://addons.mozilla.org/en-US/firefox/addon/gitlab-mr-approval-guard"
+       class="browser-card" target="_blank" rel="noopener">
+      <!-- Firefox SVG -->
+      <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="24" cy="24" r="21" fill="#FF7139"/>
+        <circle cx="24" cy="24" r="14" fill="#FF980E"/>
+        <circle cx="24" cy="24" r="8" fill="#FFF"/>
+        <circle cx="24" cy="24" r="5" fill="#0060DF"/>
+      </svg>
+      <span class="browser-card-name">Firefox</span>
+      <span class="browser-card-sub">Firefox Add-ons →</span>
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <a href="#" class="footer-logo">
+    <img src="https://raw.githubusercontent.com/CodeWithEmad/gitlab-mr-approval-extension/main/images/icon-128.png" alt="icon" />
+    GitLab MR Approval Guard
+  </a>
+  <div class="footer-links">
+    <a href="https://github.com/CodeWithEmad/gitlab-mr-approval-extension" target="_blank" rel="noopener">GitHub</a>
+    <a href="https://github.com/CodeWithEmad/gitlab-mr-approval-extension/blob/main/privacy.md" target="_blank" rel="noopener">Privacy</a>
+    <a href="https://github.com/CodeWithEmad/gitlab-mr-approval-extension/blob/main/LICENSE" target="_blank" rel="noopener">License</a>
+    <a href="https://github.com/CodeWithEmad/gitlab-mr-approval-extension/issues" target="_blank" rel="noopener">Issues</a>
+  </div>
+  <span class="footer-copy">© 2026 CodeWithEmad · MIT License</span>
+</footer>
+
+</body>
+</html>
